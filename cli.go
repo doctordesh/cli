@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func New(name string) *cli {
@@ -40,7 +41,7 @@ func (self *cli) AddSubCommand(name string, description string) *SubCommand {
 		Name:        name,
 		Description: description,
 		FlagSet:     flag.NewFlagSet(name, flag.ExitOnError),
-		Arguments:   []string{},
+		Arguments:   []Argument{},
 	}
 	s.FlagSet.Usage = s.usage
 	self.subcommands = append(self.subcommands, s)
@@ -75,7 +76,13 @@ func (self *cli) Run() int {
 	// Run the action
 	args := command.FlagSet.Args()
 	if len(args) != len(command.Arguments) {
-		fmt.Printf("error: wrong number of expected arguments, got %d, expected %d\n", len(command.Arguments), len(args))
+		if len(args) > len(command.Arguments) {
+			extraArgs := args[len(command.Arguments):]
+			fmt.Printf("error: unknown argument(s): %v\n", strings.Join(extraArgs, ", "))
+		} else {
+			missingArgs := command.argumentNames()[len(args):]
+			fmt.Printf("error: missing argument(s): %v\n", strings.Join(missingArgs, ", "))
+		}
 		command.FlagSet.Usage()
 		return 2
 	}
