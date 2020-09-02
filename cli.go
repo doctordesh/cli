@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func NewCLI(name string) *cli {
+func New(name string) *cli {
 	c := cli{
 		Name:        name,
 		subcommands: SubCommands{},
@@ -36,7 +36,7 @@ func (self *cli) usage() {
 }
 
 func (self *cli) AddSubCommand(name string, description string) *SubCommand {
-	s := SubCommand{
+	s := &SubCommand{
 		Name:        name,
 		Description: description,
 		FlagSet:     flag.NewFlagSet(name, flag.ExitOnError),
@@ -44,7 +44,7 @@ func (self *cli) AddSubCommand(name string, description string) *SubCommand {
 	}
 	s.FlagSet.Usage = s.usage
 	self.subcommands = append(self.subcommands, s)
-	return &s
+	return s
 }
 
 func (self *cli) Run() int {
@@ -74,6 +74,12 @@ func (self *cli) Run() int {
 
 	// Run the action
 	args := command.FlagSet.Args()
+	if len(args) != len(command.Arguments) {
+		fmt.Printf("error: wrong number of expected arguments, got %d, expected %d\n", len(command.Arguments), len(args))
+		command.FlagSet.Usage()
+		return 2
+	}
+
 	err = command.Action(args)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
