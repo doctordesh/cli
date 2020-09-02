@@ -18,7 +18,16 @@ func New(name string) *cli {
 
 type cli struct {
 	Name        string
+	Version     string
 	subcommands SubCommands
+}
+
+func (self *cli) nameAndVersion() string {
+	name := self.Name
+	if self.Version != "" {
+		name = fmt.Sprintf("%s (v%s)", self.Name, self.Version)
+	}
+	return name
 }
 
 func (self *cli) usage() {
@@ -29,6 +38,7 @@ func (self *cli) usage() {
 		}
 	}
 
+	fmt.Printf("Name: %s\n", self.nameAndVersion())
 	fmt.Printf("Usage: %s <sub-command>\n", self.Name)
 	fmt.Println("Sub commands:")
 	for _, subcommand := range self.subcommands {

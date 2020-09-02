@@ -43,7 +43,7 @@ func (self *SubCommand) usage() {
 		argumentsString = strings.Join(parts, " ")
 	}
 
-	fmt.Printf("%s: %s\n", self.Name, self.Description)
+	fmt.Printf("%s\n", self.Description)
 	fmt.Printf("Usage: %s %s%s\n", self.Name, optionsString, argumentsString)
 
 	if len(self.Arguments) > 0 {
